@@ -316,25 +316,23 @@
  */
 - (void) getScheduled:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        NSArray* ids = command.arguments;
-        NSArray* notifications;
-        CDVPluginResult* result;
+	NSArray* ids = command.arguments;
+	NSArray* notifications;
+	CDVPluginResult* result;
 
-        if (ids.count == 0) {
-            notifications = [[UIApplication sharedApplication]
-                             scheduledLocalNotificationOptions];
-        } else {
-            notifications = [[UIApplication sharedApplication]
-                             scheduledLocalNotificationOptions:ids];
-        }
+	if (ids.count == 0) {
+		notifications = [[UIApplication sharedApplication]
+						 scheduledLocalNotificationOptions];
+	} else {
+		notifications = [[UIApplication sharedApplication]
+						 scheduledLocalNotificationOptions:ids];
+	}
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                    messageAsArray:notifications];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								messageAsArray:notifications];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
@@ -345,25 +343,23 @@
  */
 - (void) getTriggered:(CDVInvokedUrlCommand *)command
 {
-    [self.commandDelegate runInBackground:^{
-        NSArray* ids = command.arguments;
-        NSArray* notifications;
-        CDVPluginResult* result;
+	NSArray* ids = command.arguments;
+	NSArray* notifications;
+	CDVPluginResult* result;
 
-        if (ids.count == 0) {
-            notifications = [[UIApplication sharedApplication]
-                             triggeredLocalNotificationOptions];
-        } else {
-            notifications = [[UIApplication sharedApplication]
-                             triggeredLocalNotificationOptions:ids];
-        }
+	if (ids.count == 0) {
+		notifications = [[UIApplication sharedApplication]
+						 triggeredLocalNotificationOptions];
+	} else {
+		notifications = [[UIApplication sharedApplication]
+						 triggeredLocalNotificationOptions:ids];
+	}
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                    messageAsArray:notifications];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								messageAsArray:notifications];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
@@ -372,19 +368,17 @@
  */
 - (void) hasPermission:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        CDVPluginResult* result;
-        BOOL hasPermission;
+	CDVPluginResult* result;
+	BOOL hasPermission;
 
-        hasPermission = [[UIApplication sharedApplication]
-                         hasPermissionToScheduleLocalNotifications];
+	hasPermission = [[UIApplication sharedApplication]
+					 hasPermissionToScheduleLocalNotifications];
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                     messageAsBool:hasPermission];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								 messageAsBool:hasPermission];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
