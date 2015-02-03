@@ -71,23 +71,17 @@
 {
     NSArray* notifications = command.arguments;
 
-    [self.commandDelegate runInBackground:^{
-        for (NSDictionary* options in notifications) {
-            UILocalNotification* notification;
+	for (NSDictionary* options in notifications) {
+		UILocalNotification* notification;
 
-            notification = [[UILocalNotification alloc]
-                            initWithOptions:options];
+		notification = [[UILocalNotification alloc]
+						initWithOptions:options];
 
-            [self scheduleLocalNotification:[notification copy]];
-            [self fireEvent:@"add" localNotification:notification];
+		[self scheduleLocalNotification:[notification copy]];
+		[self fireEvent:@"add" localNotification:notification];
+	}
 
-            if (notifications.count > 1) {
-                [NSThread sleepForTimeInterval:0.01];
-            }
-        }
-
-        [self execCallback:command];
-    }];
+	[self execCallback:command];
 }
 
 /**
@@ -100,27 +94,25 @@
 {
     NSArray* notifications = command.arguments;
 
-    [self.commandDelegate runInBackground:^{
-        for (NSDictionary* options in notifications) {
-            NSString* id = [options objectForKey:@"id"];
-            UILocalNotification* notification;
+	for (NSDictionary* options in notifications) {
+		NSString* id = [options objectForKey:@"id"];
+		UILocalNotification* notification;
 
-            notification = [[UIApplication sharedApplication]
-                            scheduledLocalNotificationWithId:id];
+		notification = [[UIApplication sharedApplication]
+						scheduledLocalNotificationWithId:id];
 
-            if (!notification)
-                continue;
+		if (!notification)
+			continue;
 
-            [self updateLocalNotification:[notification copy]
-                              withOptions:options];
+		[self updateLocalNotification:[notification copy]
+						  withOptions:options];
 
-            if (notifications.count > 1) {
-                [NSThread sleepForTimeInterval:0.01];
-            }
-        }
+		if (notifications.count > 1) {
+			[NSThread sleepForTimeInterval:0.01];
+		}
+	}
 
-        [self execCallback:command];
-    }];
+	[self execCallback:command];
 }
 
 /**
@@ -131,22 +123,20 @@
  */
 - (void) cancel:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        for (NSString* id in command.arguments) {
-            UILocalNotification* notification;
+	for (NSString* id in command.arguments) {
+		UILocalNotification* notification;
 
-            notification = [[UIApplication sharedApplication]
-                            scheduledLocalNotificationWithId:id];
+		notification = [[UIApplication sharedApplication]
+						scheduledLocalNotificationWithId:id];
 
-            if (!notification)
-                continue;
+		if (!notification)
+			continue;
 
-            [self cancelLocalNotification:notification];
-            [self fireEvent:@"cancel" localNotification:notification];
-        }
+		[self cancelLocalNotification:notification];
+		[self fireEvent:@"cancel" localNotification:notification];
+	}
 
-        [self execCallback:command];
-    }];
+	[self execCallback:command];
 }
 
 /**
@@ -154,11 +144,9 @@
  */
 - (void) cancelAll:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        [self cancelAllLocalNotifications];
-        [self fireEvent:@"cancelall"];
-        [self execCallback:command];
-    }];
+	[self cancelAllLocalNotifications];
+	[self fireEvent:@"cancelall"];
+	[self execCallback:command];
 }
 
 /**
@@ -169,24 +157,22 @@
  */
 - (void) exist:(CDVInvokedUrlCommand *)command
 {
-    [self.commandDelegate runInBackground:^{
-        NSString* id = [[command arguments]
-                        objectAtIndex:0];
+	NSString* id = [[command arguments]
+					objectAtIndex:0];
 
-        CDVPluginResult* result;
-        UILocalNotification* notification;
+	CDVPluginResult* result;
+	UILocalNotification* notification;
 
-        notification = [[UIApplication sharedApplication]
-                        localNotificationWithId:id];
+	notification = [[UIApplication sharedApplication]
+					localNotificationWithId:id];
 
-        bool exists = notification != NULL;
+	bool exists = notification != NULL;
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                     messageAsBool:exists];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								 messageAsBool:exists];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
@@ -197,24 +183,22 @@
  */
 - (void) isScheduled:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        NSString* id = [[command arguments]
-                        objectAtIndex:0];
+	NSString* id = [[command arguments]
+					objectAtIndex:0];
 
-        CDVPluginResult* result;
-        UILocalNotification* notification;
+	CDVPluginResult* result;
+	UILocalNotification* notification;
 
-        notification = [[UIApplication sharedApplication]
-                        scheduledLocalNotificationWithId:id];
+	notification = [[UIApplication sharedApplication]
+					scheduledLocalNotificationWithId:id];
 
-        bool isScheduled = notification != NULL;
+	bool isScheduled = notification != NULL;
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                     messageAsBool:isScheduled];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								 messageAsBool:isScheduled];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
@@ -225,24 +209,22 @@
  */
 - (void) isTriggered:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        NSString* id = [[command arguments]
-                        objectAtIndex:0];
+	NSString* id = [[command arguments]
+					objectAtIndex:0];
 
-        CDVPluginResult* result;
-        UILocalNotification* notification;
+	CDVPluginResult* result;
+	UILocalNotification* notification;
 
-        notification = [[UIApplication sharedApplication]
-                        triggeredLocalNotificationWithId:id];
+	notification = [[UIApplication sharedApplication]
+					triggeredLocalNotificationWithId:id];
 
-        bool isTriggered = notification != NULL;
+	bool isTriggered = notification != NULL;
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                     messageAsBool:isTriggered];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								 messageAsBool:isTriggered];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
@@ -250,19 +232,17 @@
  */
 - (void) getAllIds:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        CDVPluginResult* result;
-        NSArray* notIds;
+	CDVPluginResult* result;
+	NSArray* notIds;
 
-        notIds = [[UIApplication sharedApplication]
-                  localNotificationIds];
+	notIds = [[UIApplication sharedApplication]
+			  localNotificationIds];
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                    messageAsArray:notIds];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								messageAsArray:notIds];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
@@ -270,19 +250,17 @@
  */
 - (void) getScheduledIds:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        CDVPluginResult* result;
-        NSArray* scheduledIds;
+	CDVPluginResult* result;
+	NSArray* scheduledIds;
 
-        scheduledIds = [[UIApplication sharedApplication]
-                        scheduledLocalNotificationIds];
+	scheduledIds = [[UIApplication sharedApplication]
+					scheduledLocalNotificationIds];
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                    messageAsArray:scheduledIds];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								messageAsArray:scheduledIds];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
@@ -290,19 +268,17 @@
  */
 - (void) getTriggeredIds:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        CDVPluginResult* result;
-        NSArray* triggeredIds;
+	CDVPluginResult* result;
+	NSArray* triggeredIds;
 
-        triggeredIds = [[UIApplication sharedApplication]
-                        triggeredLocalNotificationIds];
+	triggeredIds = [[UIApplication sharedApplication]
+					triggeredLocalNotificationIds];
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                    messageAsArray:triggeredIds];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								messageAsArray:triggeredIds];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
@@ -313,25 +289,23 @@
  */
 - (void) getAll:(CDVInvokedUrlCommand*)command
 {
-    [self.commandDelegate runInBackground:^{
-        NSArray* ids = command.arguments;
-        NSArray* notifications;
-        CDVPluginResult* result;
+	NSArray* ids = command.arguments;
+	NSArray* notifications;
+	CDVPluginResult* result;
 
-        if (ids.count == 0) {
-            notifications = [[UIApplication sharedApplication]
-                             localNotificationOptions];
-        } else {
-            notifications = [[UIApplication sharedApplication]
-                             localNotificationOptions:ids];
-        }
+	if (ids.count == 0) {
+		notifications = [[UIApplication sharedApplication]
+						 localNotificationOptions];
+	} else {
+		notifications = [[UIApplication sharedApplication]
+						 localNotificationOptions:ids];
+	}
 
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                    messageAsArray:notifications];
+	result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+								messageAsArray:notifications];
 
-        [self.commandDelegate sendPluginResult:result
-                                    callbackId:command.callbackId];
-    }];
+	[self.commandDelegate sendPluginResult:result
+								callbackId:command.callbackId];
 }
 
 /**
