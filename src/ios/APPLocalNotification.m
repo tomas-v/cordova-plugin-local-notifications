@@ -390,10 +390,8 @@
 
     _command = command;
 
-    [self.commandDelegate runInBackground:^{
-        [[UIApplication sharedApplication]
-         registerPermissionToScheduleLocalNotifications];
-    }];
+	[[UIApplication sharedApplication] registerPermissionToScheduleLocalNotifications];
+
 #else
     [self hasPermission:command];
 #endif
