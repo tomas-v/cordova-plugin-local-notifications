@@ -38,12 +38,18 @@
     UIUserNotificationType types;
     UIUserNotificationSettings *settings;
 
-    settings = [[UIApplication sharedApplication]
-                currentUserNotificationSettings];
+	if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
 
-    types = UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound;
+		settings = [[UIApplication sharedApplication] currentUserNotificationSettings];
 
-    return (settings.types & types);
+		types = UIUserNotificationTypeAlert|UIUserNotificationTypeBadge | UIUserNotificationTypeSound;
+
+		return (settings.types & types);
+
+	} else {
+		return YES;
+	}
+
 #else
     return YES;
 #endif
