@@ -61,6 +61,10 @@
 - (void) registerPermissionToScheduleLocalNotifications
 {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+	if (![[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+		return;
+	}
+
     UIUserNotificationType types;
     UIUserNotificationSettings *settings;
 
