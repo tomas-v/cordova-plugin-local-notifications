@@ -387,10 +387,16 @@
 - (void) registerPermission:(CDVInvokedUrlCommand*)command
 {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+    
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
 
-    _command = command;
+        _command = command;
 
-	[[UIApplication sharedApplication] registerPermissionToScheduleLocalNotifications];
+        [[UIApplication sharedApplication] registerPermissionToScheduleLocalNotifications];
+    }
+    else {
+        [self hasPermission:command];
+    }
 
 #else
     [self hasPermission:command];
