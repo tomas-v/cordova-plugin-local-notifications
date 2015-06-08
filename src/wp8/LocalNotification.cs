@@ -29,6 +29,8 @@ using WPCordovaClassLib.Cordova.Commands;
 using WPCordovaClassLib.Cordova.JSON;
 
 using De.APPPlant.Cordova.Plugin.LocalNotification;
+using Microsoft.Phone.Scheduler;
+using System.Collections.Generic;
 
 namespace Cordova.Extension.Commands
 {
@@ -39,6 +41,16 @@ namespace Cordova.Extension.Commands
     public class LocalNotification : BaseCommand
     {
         /// <summary>
+        /// Additional Notification type - alarm or reminder
+        /// </summary>
+        public enum AdditionalNotificationType
+        {
+            None = 0,
+            Alarm = 1,
+            Reminder = 2
+        } 
+
+        /// <summary>
         /// Informs if the device is ready and the deviceready event has been fired
         /// </summary>
         private bool DeviceReady = false;
@@ -47,6 +59,16 @@ namespace Cordova.Extension.Commands
         /// Informs either the app is running in background or foreground
         /// </summary>
         private bool RunsInBackground = false;
+
+        /// <summary>
+        /// An additional way the notification is presented to the user.
+        /// </summary>
+        private AdditionalNotificationType notificationType = AdditionalNotificationType.Reminder;
+        public AdditionalNotificationType NotificationType
+        {
+            get { return this.notificationType; }
+            set { this.notificationType = value; }
+        } 
 
         /// <summary>
         /// Sets application live tile
@@ -66,8 +88,61 @@ namespace Cordova.Extension.Commands
 
                 AppTile.Update(TileData);
 
+                try
+                {
+                    if (this.notificationType == AdditionalNotificationType.Reminder)
+                    {
+                        //long argsTime = jsonArgs[0].Date;
+                        DateTime beginTime = ConvertUnixTimeToLocal(options.Date);
+                        
+                        if (beginTime < DateTime.Now) { // Check if schedule time is not in past
+                            System.Console.WriteLine("Scheduled notification time is in past");
+                        }
+                        else
+                        {
+                            Reminder reminder = new Reminder(options.ID);
+                            reminder.Title = options.Title;
+                            reminder.Content = options.Message;
+                            reminder.BeginTime = beginTime;
+                            //reminder.ExpirationTime = expirationTime;
+                            reminder.RecurrenceType = RecurrenceInterval.None;
+                            reminder.NavigationUri = new Uri("/MainPage.xaml", UriKind.Relative);
+
+                            //System.Console.WriteLine("Reminder " + reminder.name + " scheduled at:" + reminder.BeginTime.ToString());
+
+                            if (ScheduledActionService.Find(options.ID) != null)
+                            {
+                                ScheduledActionService.Remove(options.ID);
+                            }
+
+                            ScheduledActionService.Add(reminder);
+                        }
+                    }
+                    else if (this.notificationType == AdditionalNotificationType.Alarm)
+                    {
+                        Alarm alarm = new Alarm(options.ID);
+                        alarm.Content = options.Message;
+                        //alarm.Sound = new Uri("/Ringtones/Ring01.wma", UriKind.Relative);
+                        alarm.BeginTime = DateTime.Now.AddMinutes(1); ///new DateTime(options.Date);;
+                        //alarm.ExpirationTime = expirationTime;
+                        alarm.RecurrenceType = RecurrenceInterval.None;
+
+                        if (ScheduledActionService.Find(options.ID) != null)
+                        {
+                            ScheduledActionService.Remove(options.ID);
+                        }
+
+                        ScheduledActionService.Add(alarm);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine("Unable to add additional notification");
+                }
+
                 FireEvent("trigger", options.ID, options.JSON);
                 FireEvent("add", options.ID, options.JSON);
+
             }
 
             DispatchCommandResult();
@@ -85,6 +160,10 @@ namespace Cordova.Extension.Commands
 
             FireEvent("cancel", notificationID, "");
             DispatchCommandResult();
+
+            if (ScheduledActionService.Find(notificationID) != null) {
+                ScheduledActionService.Remove(notificationID);
+            }
         }
 
         /// <summary>
@@ -112,6 +191,17 @@ namespace Cordova.Extension.Commands
 
                 // Update the Application Tile
                 AppTile.Update(TileData);
+
+                // Remove all alarms/reminders
+                try
+                {
+                    List<ScheduledNotification> notifications = ScheduledActionService.GetActions<ScheduledNotification>().ToList();
+                    foreach (ScheduledNotification notification in notifications)
+                    {
+                        ScheduledActionService.Remove(notification.Name);
+                    }
+                }
+                catch (Exception ex) { }
             }
 
             DispatchCommandResult();
@@ -215,6 +305,13 @@ namespace Cordova.Extension.Commands
         private String ApplicationState ()
         {
             return RunsInBackground ? "background" : "foreground";
+        }
+
+        private DateTime ConvertUnixTimeToLocal(double unixTime)
+        {
+            DateTime unixEpochBeginning = new DateTime(1970,1,1,0,0,0,0, DateTimeKind.Utc);
+            DateTime localTime = unixEpochBeginning.AddSeconds(unixTime).ToLocalTime();
+            return localTime;
         }
 
         /// <summary>
