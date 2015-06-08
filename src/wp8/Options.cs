@@ -65,7 +65,7 @@ namespace De.APPPlant.Cordova.Plugin.LocalNotification
         /// <summary>
         /// Tile count
         /// </summary>
-        [DataMember(IsRequired = false, Name = "Date")]
+        [DataMember(IsRequired = false, Name = "date")]
         public int Date { get; set; }
 
         /// <summary>
